@@ -134,7 +134,7 @@ func (l *ResizeEngine) HashImageAsync(urls []string) []*Image {
 			l.mu.Unlock() // defer not always the first choice
 			continue
 		}
-		imageList = append(imageList, &Image{ // move this in the worker and lock it while editing
+		imageList = append(imageList, &Image{
 			Result: imageStatusInProgress,
 			URL:    fmt.Sprintf("http://localhost:8080/v1/image/%s.jpeg", h),
 			Cached: false,
