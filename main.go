@@ -4,12 +4,13 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
-	"github.com/gorilla/mux"
 	"io"
 	"log"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/gorilla/mux"
 )
 
 func main() {
@@ -22,6 +23,7 @@ func main() {
 	// I would use a controller as a jumping point to the actual business logic and from there to persistence
 	// also to make sure the payload/url params/variables are correct and populated accordingly
 
+	// normally i'd make subrouters for the api and any version of it
 	r.HandleFunc("/v1/resize",
 		func(w http.ResponseWriter, r *http.Request) { // using closures here just to flex
 			// { "urls": ["a","b","c"] }

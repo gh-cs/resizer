@@ -2,7 +2,6 @@ package main
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"hash/fnv"
 	"log"
 	"math/rand"
@@ -10,6 +9,8 @@ import (
 	"strconv"
 	"sync"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 const (
