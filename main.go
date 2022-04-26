@@ -2,7 +2,6 @@ package main
 
 import (
 	"bytes"
-	"context"
 	"encoding/json"
 	"io"
 	"log"
@@ -74,8 +73,6 @@ func main() {
 		func(w http.ResponseWriter, r *http.Request) {
 			// again, horribly slimmed down
 			// these should be checked
-			_, cancel := context.WithTimeout(r.Context(), 6*time.Second)
-			defer cancel()
 
 			hash := mux.Vars(r)["image_hash"]
 			res, err := engine.GetImage(hash)
@@ -91,7 +88,15 @@ func main() {
 
 	go engine.Loop()
 
-	log.Fatal(http.ListenAndServe(":8080", r))
+	srv := &http.Server{
+		Addr:         ":8080",
+		Handler:      r,
+		ReadTimeout:  15 * time.Second,
+		WriteTimeout: 15 * time.Second,
+		IdleTimeout:  120 * time.Second,
+	} // more comprehensive timeouts would be done with contextWithTimeout and listening for <-ctx.Done()
+
+	log.Fatal(srv.ListenAndServe())
 }
 
 func removeDuplicateStr(strSlice []string) []string {
