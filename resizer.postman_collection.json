@@ -1,0 +1,100 @@
+{
+	"info": {
+		"_postman_id": "97890435-84b5-4dd9-80eb-25bf63b1097b",
+		"name": "resizer",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "resize async",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"urls\": [\n        \"http://some.image.host/a.png\",\n        \"http://some.image.host/b.png\",\n        \"http://some.image.host/c.png\",\n        \"http://some.image.host/a.png\"\n        ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/resize?async=true",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"resize"
+					],
+					"query": [
+						{
+							"key": "async",
+							"value": "true"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "resize sync",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"urls\": [\n        \"http://some.image.host/a.png\",\n        \"http://some.image.host/b.png\",\n        \"http://some.image.host/c.png\",\n        \"http://some.image.host/a.png\"\n        ]\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "http://localhost:8080/v1/resize?async=false",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"resize"
+					],
+					"query": [
+						{
+							"key": "async",
+							"value": "false"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "get image",
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "http://localhost:8080/v1/image/388317717.jpeg",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "8080",
+					"path": [
+						"v1",
+						"image",
+						"388317717.jpeg"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
