@@ -73,14 +73,10 @@ func (l *ResizeEngine) worker(id string) {
 			h := strconv.Itoa(int(hash(iao.url)))
 			// check if map has hash
 			l.mu.Lock()
-			if _, ok := l.HashToImage[h]; ok {
+			if i, ok := l.HashToImage[h]; ok {
 				// if the hash is already in the map return the object on the channel (if the channel exists)
 				if iao.outputChan != nil {
-					iao.outputChan <- Image{
-						Result: l.HashToImage[h].Result,
-						URL:    l.HashToImage[h].URL,
-						Cached: l.HashToImage[h].Cached,
-					}
+					iao.outputChan <- i
 				}
 				l.mu.Unlock()
 				continue
@@ -123,12 +119,8 @@ func (l *ResizeEngine) HashImageAsync(urls []string) []Image {
 		h := strconv.Itoa(int(hash(url)))
 
 		l.mu.Lock()
-		if _, ok := l.HashToImage[h]; ok { // hash already in map, get the object
-			imageList = append(imageList, Image{
-				Result: l.HashToImage[h].Result,
-				URL:    l.HashToImage[h].URL,
-				Cached: l.HashToImage[h].Cached,
-			})
+		if i, ok := l.HashToImage[h]; ok { // hash already in map, get the object
+			imageList = append(imageList, i)
 			l.mu.Unlock() // defer not always the first choice
 			continue
 		}
@@ -155,14 +147,10 @@ func (l *ResizeEngine) HashImageSync(urls []string) []Image {
 		h := strconv.Itoa(int(hash(url)))
 
 		l.mu.Lock()
-		if _, ok := l.HashToImage[h]; ok { // hash already in map, get the object
+		if i, ok := l.HashToImage[h]; ok { // hash already in map, get the object
 			// check if the found image is in status success
 			// otherwise wait for it
-			imageList = append(imageList, Image{
-				Result: l.HashToImage[h].Result,
-				URL:    l.HashToImage[h].URL,
-				Cached: l.HashToImage[h].Cached,
-			})
+			imageList = append(imageList, i)
 			l.mu.Unlock()
 			continue
 		}
@@ -206,11 +194,7 @@ func (l *ResizeEngine) HashImageSyncV2(ctx context.Context, urls []string) ([]Im
 
 		// best case scenario, grab the image and add it to the images slice
 		if i.Result == imageStatusSuccess {
-			imageList = append(imageList, Image{
-				Result: l.HashToImage[h].Result,
-				URL:    l.HashToImage[h].URL,
-				Cached: l.HashToImage[h].Cached,
-			})
+			imageList = append(imageList, i)
 		}
 
 		// anything else is in processing
