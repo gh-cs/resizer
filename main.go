@@ -2,6 +2,7 @@ package main
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"io"
 	"log"
@@ -32,6 +33,10 @@ func main() {
 			// normally we would have a json friendly error type with relevant info i.e. what part of the payload failed
 			// or if the error was internal or of a 3rd party i.e. imgur is down
 			// these are usually detailed in a spec of the architect's choice i.e. swagger or openapi
+			ctx, cancel := context.WithTimeout(r.Context(), 16*time.Second)
+			// to force a timeout error just set the duration to something like 5-6 seconds
+			defer cancel()
+
 			var async bool
 			val, ok := r.URL.Query()["async"]
 			if !ok {
@@ -63,7 +68,13 @@ func main() {
 				// async is false but wait for all the results before displaying them
 				// this is preferred from a performance point of view as opposed to iterating through the url slice
 				// create an output channel per request and receive the set of processed images on that channel only
-				res, _ = json.Marshal(engine.HashImageSync(uniqueURLs))
+				imageList, err := engine.HashImageSyncV2(ctx, uniqueURLs)
+				if err != nil {
+					w.WriteHeader(http.StatusNotFound)
+					_, _ = w.Write([]byte(err.Error()))
+					return
+				}
+				res, err = json.Marshal(imageList)
 			}
 
 			_, _ = w.Write(res)
@@ -73,9 +84,12 @@ func main() {
 		func(w http.ResponseWriter, r *http.Request) {
 			// again, horribly slimmed down
 			// these should be checked
+			ctx, cancel := context.WithTimeout(r.Context(), 16*time.Second)
+			// to force a timeout error just set the duration to something like 5-6 seconds
+			defer cancel()
 
 			hash := mux.Vars(r)["image_hash"]
-			res, err := engine.GetImage(hash)
+			res, err := engine.GetImage(ctx, hash)
 			if err != nil {
 				w.WriteHeader(http.StatusNotFound)
 				_, _ = w.Write([]byte(err.Error()))
@@ -91,8 +105,8 @@ func main() {
 	srv := &http.Server{
 		Addr:         ":8080",
 		Handler:      r,
-		ReadTimeout:  15 * time.Second,
-		WriteTimeout: 15 * time.Second,
+		ReadTimeout:  20 * time.Second,
+		WriteTimeout: 20 * time.Second,
 		IdleTimeout:  120 * time.Second,
 	} // more comprehensive timeouts would be done with contextWithTimeout and listening for <-ctx.Done()
 
