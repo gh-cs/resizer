@@ -190,11 +190,13 @@ func (l *ResizeEngine) HashImageSyncV2(ctx context.Context, urls []string) ([]Im
 				url:        url,
 				outputChan: oc,
 			}
+			continue
 		}
 
 		// best case scenario, grab the image and add it to the images slice
 		if i.Result == imageStatusSuccess {
 			imageList = append(imageList, i)
+			continue
 		}
 
 		// anything else is in processing
